@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -14,5 +16,11 @@ var parallel = flag.Bool("p", false, "Send requests in parallel (default: false)
 
 func main() {
 	log.Info("Starting application...")
+	flag.Parse()
 
+	outputDirPath := filepath.Join(*outputDir, time.Now().Format(time.RFC850))
+	log.Infof("Creating dir for this benchmark at `%s`", outputDirPath)
+	if err := os.MkdirAll(outputDirPath, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
 }
