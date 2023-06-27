@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+	apigateway "github.com/aws/aws-sdk-go/service/apigateway"
 )
 
 var outputDir = flag.String("o", "./latency_samples/", "Output directory for latency samples (default: ./latency_samples/)")
