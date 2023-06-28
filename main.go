@@ -161,7 +161,7 @@ func main() {
 	RunCommandAndLog(exec.Command("sh", "-c", command))
 	endTime := time.Now()
 	log.Infof("Request completed at %s", endTime)
-	log.Infof("Time taken for request: %s", endTime.Sub(startTime))
+	log.Infof("Time taken for request: %s", endTime.Sub(startTime).Milliseconds())
 }
 
 // RunCommandAndLog runs a command in the terminal, logs the result and returns it
