@@ -57,7 +57,6 @@ func main() {
 		endpoint = endpoint + "hellojava_SnapStartDisabled"
 	}
 	req, _ := http.NewRequest(http.MethodGet, endpoint, bytes.NewReader(reqBody))
-	req = req.WithContext(ctx)
 	signer := v4.NewSigner(cfg.Credentials)
 	_, err = signer.Sign(req, nil, "execute-api", cfg.Region, time.Now())
 	if err != nil {
