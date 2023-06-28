@@ -5,7 +5,6 @@ import (
 	"flag"
 	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/config"
-	config "github.com/aws/aws-sdk-go-v2/config"
 	apigateway "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -15,7 +14,7 @@ import (
 )
 
 type RequestBody struct {
-	queryStringParameters map[string]string
+	queryStringParameters map[string]int
 }
 
 var outputDir = flag.String("o", "./latency_samples/", "Output directory for latency samples (default: ./latency_samples/)")
@@ -34,10 +33,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	credentials, err := cfg.Credentials.Retrieve(context.TODO())
-	if err != nil {
-		log.Fatal(err)
-	}
 	outputDirPath := filepath.Join(*outputDir, time.Now().Format(time.RFC850))
 	log.Infof("Creating dir for this benchmark at `%s`", outputDirPath)
 	if err := os.MkdirAll(outputDirPath, os.ModePerm); err != nil {
