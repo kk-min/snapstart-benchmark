@@ -14,6 +14,10 @@ import (
 	"time"
 )
 
+type RequestBody struct {
+	queryStringParameters map[string]string
+}
+
 var outputDir = flag.String("o", "./latency_samples/", "Output directory for latency samples (default: ./latency_samples/)")
 var burstCount = flag.Int("b", 1, "Number of bursts to send (default: 1)")
 var burstSize = flag.Int("s", 1, "Number of requests to send in a burst (default: 1)")
@@ -39,7 +43,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "", nil)
+	reqBody := RequestBody{
+		queryStringParameters: map[string]string{
+			"incrementLimit": 1,
+		},
+	}
+	req, _ := http.NewRequest(http.MethodGet, "<API_GATEWAY_ROUTE>hellojava_SnapStartDisabled", reqBody)
 	req = req.WithContext(ctx)
 	signer := v4.NewSigner(cfg.Credentials)
 	_, err = signer.Sign(req, nil, "execute-api", cfg.Region, time.Now())
@@ -59,4 +68,5 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	fmt.Println(res.Body)
 }
