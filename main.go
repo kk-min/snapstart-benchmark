@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	config "github.com/aws/aws-sdk-go-v2/config"
 	apigateway "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -24,4 +25,6 @@ func main() {
 	if err := os.MkdirAll(outputDirPath, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
+
+	log.Info("Creating API Gateway client...")
 }
