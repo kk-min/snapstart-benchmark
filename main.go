@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"os"
 	"os/exec"
 	"time"
 )
