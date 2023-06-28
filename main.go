@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
@@ -14,7 +15,7 @@ import (
 )
 
 type RequestBody struct {
-	queryStringParameters map[string]int
+	queryStringParameters map[string]int `json:"queryStringParameters"`
 }
 
 var outputDir = flag.String("o", "./latency_samples/", "Output directory for latency samples (default: ./latency_samples/)")
@@ -39,18 +40,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	reqBody := RequestBody{
-		queryStringParameters: map[string]string{
+	reqBody, err := json.Marshal(RequestBody{
+		queryStringParameters: map[string]int{
 			"incrementLimit": 1,
 		},
+	})
+	if err != nil {
+		log.Fatal(err)
 	}
+
 	endpoint := "<API_GATEWAY_ROUTE>"
 	if snapStartEnabled {
 		endpoint = endpoint + "hellojava_SnapStartEnabled"
 	} else {
 		endpoint = endpoint + "hellojava_SnapStartDisabled"
 	}
-	req, _ := http.NewRequest(http.MethodGet, endpoint, reqBody)
+	req, _ := http.NewRequest(http.MethodGet, endpoint, bytes.NewReader(reqBody))
 	req = req.WithContext(ctx)
 	signer := v4.NewSigner(cfg.Credentials)
 	_, err = signer.Sign(req, nil, "execute-api", cfg.Region, time.Now())
