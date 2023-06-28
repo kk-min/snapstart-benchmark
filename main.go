@@ -7,7 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 )
 
@@ -25,12 +24,6 @@ var snapStartEnabled = flag.Bool("snapstart", false, "Enable SnapStart (default:
 func main() {
 	log.Info("Starting application...")
 	flag.Parse()
-
-	outputDirPath := filepath.Join(*outputDir, time.Now().Format(time.RFC850))
-	log.Infof("Creating dir for this benchmark at `%s`", outputDirPath)
-	if err := os.MkdirAll(outputDirPath, os.ModePerm); err != nil {
-		log.Fatal(err)
-	}
 
 	reqBody := `{
   "body": "",
