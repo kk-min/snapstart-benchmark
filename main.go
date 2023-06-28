@@ -155,6 +155,7 @@ func main() {
 		endpoint = endpoint + "hellojava_SnapStartDisabled"
 	}
 	command := `curl -X POST -H  "x-api-key: <API_KEY>" -H "Content-Type: application/json" -d ` + reqBody + ` ` + endpoint
+	log.Info(command)
 	startTime := time.Now()
 	log.Infof("Sending request at %s", startTime)
 	RunCommandAndLog(exec.Command("sh", "-c", command))
