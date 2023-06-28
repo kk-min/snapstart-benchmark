@@ -24,7 +24,7 @@ func main() {
 	log.Info("Starting application...")
 	flag.Parse()
 
-	reqBody := `{
+	reqBody := `'{
   "body": "",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
@@ -146,7 +146,7 @@ func main() {
     "apiId": "1234567890",
     "protocol": "HTTP/1.1"
   }
-}`
+}'`
 
 	endpoint := "<API_GATEWAY_ROUTE>"
 	if *snapStartEnabled {
