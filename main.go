@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -30,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	reqBody = `{
+	reqBody := `{
   "body": "",
   "resource": "/{proxy+}",
   "path": "/path/to/resource",
@@ -155,16 +157,30 @@ func main() {
 }`
 
 	endpoint := "<API_GATEWAY_ROUTE>"
-	if snapStartEnabled {
+	if *snapStartEnabled {
 		endpoint = endpoint + "hellojava_SnapStartEnabled"
 	} else {
 		endpoint = endpoint + "hellojava_SnapStartDisabled"
 	}
-	command = `curl -X POST -H  "x-api-key: <API_KEY>" -H "Content-Type: application/json" -d ` + reqBody + ` ` + endpoint
+	command := `curl -X POST -H  "x-api-key: <API_KEY>" -H "Content-Type: application/json" -d ` + reqBody + ` ` + endpoint
 	startTime := time.Now()
 	log.Infof("Sending request at %s", startTime)
-	os.exec.Command("sh", "-c", command)
+	RunCommandAndLog(exec.Command("sh", "-c", command))
 	endTime := time.Now()
 	log.Infof("Request completed at %s", endTime)
 	log.Infof("Time taken for request: %s", endTime.Sub(startTime))
+}
+
+// RunCommandAndLog runs a command in the terminal, logs the result and returns it
+func RunCommandAndLog(cmd *exec.Cmd) string {
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		log.Fatalf("%s: %s", fmt.Sprint(err.Error()), stderr.String())
+	}
+	log.Debugf("Command result: %s", out.String())
+	return out.String()
 }
