@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
+	apigateway "github.com/aws/aws-sdk-go-v2/service/apigateway"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"time"
-	apigateway "github.com/aws/aws-sdk-go/service/apigateway"
 )
 
 var outputDir = flag.String("o", "./latency_samples/", "Output directory for latency samples (default: ./latency_samples/)")
