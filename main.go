@@ -7,6 +7,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
+	"path/filepath"
 	"sync"
 	"time"
 )
@@ -49,8 +50,8 @@ func main() {
 
 	Log.Infof("Writing data to CSV file...")
 	wg.Add(2)
-	go WriteDataToFile(&wg, snapStartEnabledData, *outputDir+currentTime+"_snapstart_enabled.csv")
-	go WriteDataToFile(&wg, snapStartDisabledData, *outputDir+currentTime+"_snapstart_disabled.csv")
+	go WriteDataToFile(&wg, &snapStartEnabledData, *outputDir+currentTime+"_snapstart_enabled.csv")
+	go WriteDataToFile(&wg, &snapStartDisabledData, *outputDir+currentTime+"_snapstart_disabled.csv")
 	wg.Wait()
 	Log.Infof("Written data to files %s and %s", *outputDir+currentTime+"_snapstart_enabled.csv", *outputDir+currentTime+"_snapstart_disabled.csv")
 }
@@ -85,5 +86,22 @@ func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStart
 		log.Infof("Time taken for request: %d", latency)
 		*data = append(*data, int(latency))
 		time.Sleep(burstIAT * time.Millisecond)
+	}
+}
+
+func WriteDataToFile(wg *sync.WaitGroup, data *[]int, outputFilePath string) {
+	defer wg.Done()
+	file, err := os.Create(outputFilePath)
+	if err != nil {
+		log.Fatalf("Cannot create file %s", outputFilePath)
+	}
+	defer file.Close()
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+	for _, value := range *data {
+		err := writer.Write([]string{strconv.Itoa(value)})
+		if err != nil {
+			log.Fatalf("Cannot write to file %s", outputFilePath)
+		}
 	}
 }
