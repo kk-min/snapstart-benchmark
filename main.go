@@ -7,6 +7,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os/exec"
+	"sync"
 	"time"
 )
 
@@ -24,6 +25,8 @@ var snapStartEnabled = flag.Bool("snapstart", false, "Enable SnapStart (default:
 func main() {
 	log.Info("Starting application...")
 	flag.Parse()
+	// Format current time in RFC3339 format
+	currentTime := time.Now().Format(time.RFC3339)
 
 	endpoint := "<API_GATEWAY_ROUTE>"
 	//	if *snapStartEnabled {
@@ -35,8 +38,11 @@ func main() {
 	snapStartDisabledEndpoint := endpoint + "hellojava_SnapStartDisabled"
 	snapStartEnabledData := []int{}
 	snapStartDisabledData := []int{}
-	go RunBenchMark(snapStartEnabledEndpoint, *burstCount, true, &snapStartEnabledData)
-	go RunBenchMark(snapStartDisabledEndpoint, *burstCount, false, &snapStartDisabledData)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go RunBenchMark(&wg, snapStartEnabledEndpoint, *burstCount, true, &snapStartEnabledData)
+	go RunBenchMark(&wg, snapStartDisabledEndpoint, *burstCount, false, &snapStartDisabledData)
+	wg.Wait()
 }
 
 // RunCommandAndLog runs a command in the terminal, logs the result and returns it
@@ -53,7 +59,8 @@ func RunCommandAndLog(cmd *exec.Cmd) string {
 	return out.String()
 }
 
-func RunBenchMark(endpoint string, iterations int, snapStartEnabled bool, data *[]int) {
+func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStartEnabled bool, data *[]int) {
+	defer wg.Done()
 	log.Infof("Running benchmark with %d iterations, SnapStart enabled: %t", iterations, snapStartEnabled)
 	for i := 0; i < iterations; i++ {
 		log.Infof("Iteration %d", i)
@@ -69,4 +76,5 @@ func RunBenchMark(endpoint string, iterations int, snapStartEnabled bool, data *
 		*data = append(*data, int(latency))
 		time.Sleep(burstIAT * time.Millisecond)
 	}
+
 }
