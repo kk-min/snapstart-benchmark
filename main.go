@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/csv"
 	"flag"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -25,19 +26,17 @@ func main() {
 	flag.Parse()
 
 	endpoint := "<API_GATEWAY_ROUTE>"
-	if *snapStartEnabled {
-		endpoint = endpoint + "hellojava_SnapStartEnabled"
-	} else {
-		endpoint = endpoint + "hellojava_SnapStartDisabled"
-	}
-	command := `curl -X GET -H "x-api-key: <API_KEY>" -H "Content-Type: application/json" ` + endpoint
-	log.Info(command)
-	startTime := time.Now()
-	log.Infof("Sending request at %s", startTime)
-	RunCommandAndLog(exec.Command("sh", "-c", command))
-	endTime := time.Now()
-	log.Infof("Request completed at %s", endTime)
-	log.Infof("Time taken for request: %d", endTime.Sub(startTime).Milliseconds())
+	//	if *snapStartEnabled {
+	//		endpoint = endpoint + "hellojava_SnapStartEnabled"
+	//	} else {
+	//		endpoint = endpoint + "hellojava_SnapStartDisabled"
+	//	}
+	snapStartEnabledEndpoint := endpoint + "hellojava_SnapStartEnabled"
+	snapStartDisabledEndpoint := endpoint + "hellojava_SnapStartDisabled"
+	snapStartEnabledData := []int{}
+	snapStartDisabledData := []int{}
+	go RunBenchMark(snapStartEnabledEndpoint, *burstCount, true, &snapStartEnabledData)
+	go RunBenchMark(snapStartDisabledEndpoint, *burstCount, false, &snapStartDisabledData)
 }
 
 // RunCommandAndLog runs a command in the terminal, logs the result and returns it
