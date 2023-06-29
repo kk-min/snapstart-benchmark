@@ -85,7 +85,7 @@ func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStart
 		log.Infof("Request completed at %s", endTime)
 		latency := endTime.Sub(startTime).Milliseconds()
 		log.Infof("Time taken for request: %d", latency)
-		*data = append(*data, strconv.FormatInt(latency))
+		*data = append(*data, strconv.FormatInt(latency, 10))
 		time.Sleep(time.Duration(*burstIAT) * time.Millisecond)
 	}
 }
