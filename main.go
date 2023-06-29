@@ -38,11 +38,21 @@ func main() {
 	snapStartDisabledEndpoint := endpoint + "hellojava_SnapStartDisabled"
 	snapStartEnabledData := []int{}
 	snapStartDisabledData := []int{}
+
 	var wg sync.WaitGroup
+	Log.Infof("Running benchmarks...")
 	wg.Add(2)
 	go RunBenchMark(&wg, snapStartEnabledEndpoint, *burstCount, true, &snapStartEnabledData)
 	go RunBenchMark(&wg, snapStartDisabledEndpoint, *burstCount, false, &snapStartDisabledData)
 	wg.Wait()
+	Log.Infof("Benchmarks completed.")
+
+	Log.Infof("Writing data to CSV file...")
+	wg.Add(2)
+	go WriteDataToFile(&wg, snapStartEnabledData, *outputDir+currentTime+"_snapstart_enabled.csv")
+	go WriteDataToFile(&wg, snapStartDisabledData, *outputDir+currentTime+"_snapstart_disabled.csv")
+	wg.Wait()
+	Log.Infof("Written data to files %s and %s", *outputDir+currentTime+"_snapstart_enabled.csv", *outputDir+currentTime+"_snapstart_disabled.csv")
 }
 
 // RunCommandAndLog runs a command in the terminal, logs the result and returns it
@@ -76,5 +86,4 @@ func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStart
 		*data = append(*data, int(latency))
 		time.Sleep(burstIAT * time.Millisecond)
 	}
-
 }
