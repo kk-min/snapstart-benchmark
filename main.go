@@ -29,6 +29,7 @@ func main() {
 	flag.Parse()
 	// Format current time in RFC3339 format
 	currentTime := time.Now().Format(time.RFC3339)
+	log.Infof("Creating output directory at %s", *outputDir+currentTime)
 
 	endpoint := "<API_GATEWAY_ROUTE>"
 	//	if *snapStartEnabled {
@@ -51,8 +52,8 @@ func main() {
 
 	log.Infof("Writing data to CSV file...")
 	wg.Add(2)
-	go WriteDataToFile(&wg, &snapStartEnabledData, *outputDir+currentTime+"_snapstart_enabled.csv")
-	go WriteDataToFile(&wg, &snapStartDisabledData, *outputDir+currentTime+"_snapstart_disabled.csv")
+	go WriteDataToFile(&wg, &snapStartEnabledData, *outputDir+currentTime+"/snapstart_enabled.csv")
+	go WriteDataToFile(&wg, &snapStartDisabledData, *outputDir+currentTime+"/snapstart_disabled.csv")
 	wg.Wait()
 	log.Infof("Written data to files %s and %s", *outputDir+currentTime+"_snapstart_enabled.csv", *outputDir+currentTime+"_snapstart_disabled.csv")
 }
