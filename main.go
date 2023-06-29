@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
@@ -29,7 +30,11 @@ func main() {
 	flag.Parse()
 	// Format current time in RFC3339 format
 	currentTime := time.Now().Format(time.RFC3339)
-	log.Infof("Creating output directory at %s", *outputDir+currentTime)
+	outputDirPath := filepath.Join(*outputDir, currentTime)
+	log.Infof("Creating output directory at %s", outputDirPath)
+	if err := os.MkdirAll(outputDirPath, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
 
 	endpoint := "<API_GATEWAY_ROUTE>"
 	//	if *snapStartEnabled {
