@@ -53,3 +53,21 @@ func RunCommandAndLog(cmd *exec.Cmd) string {
 	log.Debugf("Command result: %s", out.String())
 	return out.String()
 }
+
+func RunBenchMark(endpoint string, iterations int, snapStartEnabled bool, data *[]int) {
+	log.Infof("Running benchmark with %d iterations, SnapStart enabled: %t", iterations, snapStartEnabled)
+	for i := 0; i < iterations; i++ {
+		log.Infof("Iteration %d", i)
+		command := `curl -X GET -H "x-api-key: <API_KEY>" -H "Content-Type: application/json" ` + endpoint
+		log.Info(command)
+		startTime := time.Now()
+		log.Infof("Sending request at %s", startTime)
+		RunCommandAndLog(exec.Command("sh", "-c", command))
+		endTime := time.Now()
+		log.Infof("Request completed at %s", endTime)
+		latency := endTime.Sub(startTime).Milliseconds()
+		log.Infof("Time taken for request: %d", latency)
+		*data = append(*data, int(latency))
+		time.Sleep(burstIAT * time.Millisecond)
+	}
+}
