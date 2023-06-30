@@ -50,8 +50,6 @@ func main() {
 	//	}
 	snapStartEnabledEndpoint := endpoint + "hellojava_SnapStartEnabled"
 	snapStartDisabledEndpoint := endpoint + "hellojava_SnapStartDisabled"
-	snapStartEnabledData := []string{}
-	snapStartDisabledData := []string{}
 
 	var wg sync.WaitGroup
 	log.Infof("Running benchmarks...")
@@ -106,6 +104,10 @@ func CreateFile(filePath string) {
 
 func WriteDataToFile(data *[]string, outputFilePath string) {
 	log.Infof("Writing data to file %s", outputFilePath)
+	file, err := os.OpenFile(outputFilePath, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	if err != nil {
+		log.Fatalf("Cannot open file %s", outputFilePath)
+	}
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 	for _, value := range *data {
