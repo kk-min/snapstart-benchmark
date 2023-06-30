@@ -108,6 +108,7 @@ func WriteDataToFile(data *[]string, outputFilePath string) {
 	if err != nil {
 		log.Fatalf("Cannot open file %s", outputFilePath)
 	}
+	defer file.Close()
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 	for _, value := range *data {
