@@ -36,6 +36,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	log.Infof("Creating output files...")
+	snapStartEnabledFilePath := *outputDir + currentTime + "/snapstart_enabled.csv"
+	snapStartDisabledFilePath := *outputDir + currentTime + "/snapstart_disabled.csv"
+	CreateFile(snapStartEnabledFilePath)
+	CreateFile(snapStartDisabledFilePath)
+
 	endpoint := "<API_GATEWAY_ROUTE>"
 	//	if *snapStartEnabled {
 	//		endpoint = endpoint + "hellojava_SnapStartEnabled"
@@ -50,16 +56,10 @@ func main() {
 	var wg sync.WaitGroup
 	log.Infof("Running benchmarks...")
 	wg.Add(2)
-	go RunBenchMark(&wg, snapStartEnabledEndpoint, *burstCount, true, &snapStartEnabledData)
-	go RunBenchMark(&wg, snapStartDisabledEndpoint, *burstCount, false, &snapStartDisabledData)
+	go RunBenchMark(&wg, snapStartEnabledEndpoint, *burstCount, true, snapStartEnabledFilePath)
+	go RunBenchMark(&wg, snapStartDisabledEndpoint, *burstCount, false, snapStartDisabledFilePath)
 	wg.Wait()
 	log.Infof("Benchmarks completed.")
-
-	log.Infof("Writing data to CSV file...")
-	wg.Add(2)
-	go WriteDataToFile(&wg, &snapStartEnabledData, *outputDir+currentTime+"/snapstart_enabled.csv")
-	go WriteDataToFile(&wg, &snapStartDisabledData, *outputDir+currentTime+"/snapstart_disabled.csv")
-	wg.Wait()
 	log.Infof("Written data to files %s and %s", *outputDir+currentTime+"_snapstart_enabled.csv", *outputDir+currentTime+"_snapstart_disabled.csv")
 }
 
@@ -77,7 +77,7 @@ func RunCommandAndLog(cmd *exec.Cmd) string {
 	return out.String()
 }
 
-func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStartEnabled bool, data *[]string) {
+func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStartEnabled bool, outputFilePath string) {
 	defer wg.Done()
 	log.Infof("Running benchmark with %d iterations, SnapStart enabled: %t", iterations, snapStartEnabled)
 	for i := 0; i < iterations; i++ {
@@ -90,19 +90,22 @@ func RunBenchMark(wg *sync.WaitGroup, endpoint string, iterations int, snapStart
 		endTime := time.Now()
 		log.Infof("Request completed at %s", endTime)
 		latency := endTime.Sub(startTime).Milliseconds()
-		log.Infof("Time taken for request: %d", latency)
-		*data = append(*data, strconv.FormatInt(latency, 10))
+		log.Infof("Time taken for request (SnapStart: %t): %d", snapStartEnabled, latency)
+		WriteDataToFile(&[]string{strconv.FormatInt(latency, 10)}, outputFilePath)
 		time.Sleep(time.Duration(*burstIAT) * time.Millisecond)
 	}
 }
 
-func WriteDataToFile(wg *sync.WaitGroup, data *[]string, outputFilePath string) {
-	defer wg.Done()
-	file, err := os.Create(outputFilePath)
+func CreateFile(filePath string) {
+	file, err := os.Create(filePath)
 	if err != nil {
-		log.Fatalf("Cannot create file %s", outputFilePath)
+		log.Fatalf("Cannot create file %s", filePath)
 	}
 	defer file.Close()
+}
+
+func WriteDataToFile(data *[]string, outputFilePath string) {
+	log.Infof("Writing data to file %s", outputFilePath)
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 	for _, value := range *data {
