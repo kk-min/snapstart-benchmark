@@ -58,7 +58,7 @@ func main() {
 	go RunBenchMark(&wg, snapStartDisabledEndpoint, *burstCount, false, snapStartDisabledFilePath)
 	wg.Wait()
 	log.Infof("Benchmarks completed.")
-	log.Infof("Written data to files %s and %s", *outputDir+currentTime+"_snapstart_enabled.csv", *outputDir+currentTime+"_snapstart_disabled.csv")
+	log.Infof("Written data to files %s and %s", *outputDir+currentTime+"/snapstart_enabled.csv", *outputDir+currentTime+"_snapstart_disabled.csv")
 }
 
 // RunCommandAndLog runs a command in the terminal, logs the result and returns it
