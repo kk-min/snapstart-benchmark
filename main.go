@@ -48,8 +48,8 @@ func main() {
 	//	} else {
 	//		endpoint = endpoint + "hellojava_SnapStartDisabled"
 	//	}
-	snapStartEnabledEndpoint := endpoint + "hellojava_SnapStartEnabled"
-	snapStartDisabledEndpoint := endpoint + "hellojava_SnapStartDisabled"
+	snapStartEnabledEndpoint := endpoint + "hellojava_WithFiller_SnapStartEnabled"
+	snapStartDisabledEndpoint := endpoint + "hellojava_WithFiller_SnapStartDisabled"
 
 	var wg sync.WaitGroup
 	log.Infof("Running benchmarks...")
