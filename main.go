@@ -43,11 +43,6 @@ func main() {
 	CreateFile(snapStartDisabledFilePath)
 
 	endpoint := "<API_GATEWAY_ROUTE>"
-	//	if *snapStartEnabled {
-	//		endpoint = endpoint + "hellojava_SnapStartEnabled"
-	//	} else {
-	//		endpoint = endpoint + "hellojava_SnapStartDisabled"
-	//	}
 	snapStartEnabledEndpoint := endpoint + "hellojava_WithFiller_SnapStartEnabled"
 	snapStartDisabledEndpoint := endpoint + "hellojava_WithFiller_SnapStartDisabled"
 
