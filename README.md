@@ -10,4 +10,3 @@ Program to perform manual benchmarking for AWS Lambda's SnapStart.
 - `-b`: Burst count (integer)
 - `-i`: Inter-arrival time (IAT) (milliseconds)
 - `-o`: Output directory (dir path)
-- `snapstart`: SnapStart enabled (true/false)
